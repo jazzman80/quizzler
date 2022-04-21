@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'question.dart';
+import 'quiz.dart';
 
 void main() {
   runApp(const MyApp());
@@ -30,15 +30,7 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  List<Icon> scoreKeeper = [];
-
-  List<Question> questions = [
-    Question('You can lead a cow down stairs but not up stairs.', false),
-    Question('Approximately one quarter of human bones are in the feet.', true),
-    Question('Slug\'s blood is green.', true),
-  ];
-
-  int questionNumber = 0;
+  Quiz quiz = Quiz();
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +39,7 @@ class _MainPageState extends State<MainPage> {
         Expanded(
           child: Center(
             child: Text(
-              questions[questionNumber].text,
+              quiz.getQuestionText(),
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 24,
@@ -63,7 +55,7 @@ class _MainPageState extends State<MainPage> {
               ElevatedButton(
                 onPressed: () {
                   setState(() {
-                    questionNumber++;
+                    quiz.nextQuestion(true);
                   });
                 },
                 child: const Text('Yes'),
@@ -75,7 +67,7 @@ class _MainPageState extends State<MainPage> {
               ElevatedButton(
                 onPressed: () {
                   setState(() {
-                    questionNumber++;
+                    quiz.nextQuestion(playerAnswer: false);
                   });
                 },
                 child: const Text('No'),
@@ -88,7 +80,8 @@ class _MainPageState extends State<MainPage> {
           ),
         ),
         Row(
-          children: scoreKeeper,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: quiz.scoreKeeper.getIconsList(),
         )
       ],
     );
