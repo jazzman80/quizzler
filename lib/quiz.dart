@@ -1,12 +1,5 @@
-import 'package:flutter/material.dart';
-
 class Quiz {
-  ScoreKeeper scoreKeeper = ScoreKeeper();
   int _questionNumber = 0;
-
-  Quiz() {
-    scoreKeeper.createIconsPool(_questions.length);
-  }
 
   final List<Question> _questions = [
     Question('Some cats are actually allergic to humans', true),
@@ -36,22 +29,42 @@ class Quiz {
         true),
   ];
 
-  void nextQuestion(bool playerAnswer) {
-    scoreKeeper.setAnswerIcon(
-        _questionNumber, isPlayerAnswerCorrect(playerAnswer));
-    if (_questionNumber < _questions.length - 1) _questionNumber++;
+  void nextQuestion() {
+    if (_questionNumber < _questions.length - 1) {
+      _questionNumber++;
+    }
   }
 
   String getQuestionText() {
     return _questions[_questionNumber].text;
   }
 
-  bool isPlayerAnswerCorrect({required bool playerAnswer}) {
+  int getNumberOfQuestions() {
+    return _questions.length;
+  }
+
+  int getQuestionNumber() {
+    return _questionNumber;
+  }
+
+  bool isGameOver() {
+    if (_questionNumber == _questions.length - 1) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  bool isPlayerAnswerCorrect(bool playerAnswer) {
     if (playerAnswer == _questions[_questionNumber].answer) {
       return true;
     } else {
       return false;
     }
+  }
+
+  void restartGame() {
+    _questionNumber = 0;
   }
 }
 
@@ -60,37 +73,4 @@ class Question {
   bool answer;
 
   Question(this.text, this.answer);
-}
-
-class ScoreKeeper {
-  final List<Icon> _iconsList = [];
-
-  void createIconsPool(int length) {
-    for (int i = 0; i < length; i++) {
-      _iconsList.add(
-        const Icon(
-          Icons.check,
-          color: Colors.grey,
-        ),
-      );
-    }
-  }
-
-  void setAnswerIcon(int questionNumber, bool isPlayerAnswerCorrect) {
-    if (isPlayerAnswerCorrect) {
-      _iconsList[questionNumber] = const Icon(
-        Icons.check,
-        color: Colors.green,
-      );
-    } else {
-      _iconsList[questionNumber] = const Icon(
-        Icons.close,
-        color: Colors.red,
-      );
-    }
-  }
-
-  List<Icon> getIconsList() {
-    return _iconsList;
-  }
 }

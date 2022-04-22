@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'quiz.dart';
+import 'score_keeper.dart';
 
 void main() {
   runApp(const MyApp());
@@ -30,16 +32,41 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  Quiz quiz = Quiz();
+  static Quiz quiz = Quiz();
+  ScoreKeeper scoreKeeper = ScoreKeeper(quiz.getNumberOfQuestions());
 
   @override
   Widget build(BuildContext context) {
+    showGameOverDialog() {
+      Alert(
+        context: context,
+        title: 'Game Over',
+        style: const AlertStyle(
+          isCloseButton: false,
+          isOverlayTapDismiss: false,
+        ),
+        buttons: [
+          DialogButton(
+            child: const Text('Restart Quiz'),
+            onPressed: () {
+              setState(() {
+                Navigator.pop(context);
+                quiz.restartGame();
+                scoreKeeper.reloadIconsPool();
+              });
+            },
+          ),
+        ],
+      ).show();
+    }
+
     return Column(
       children: [
         Expanded(
           child: Center(
             child: Text(
               quiz.getQuestionText(),
+              textAlign: TextAlign.center,
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 24,
@@ -55,7 +82,12 @@ class _MainPageState extends State<MainPage> {
               ElevatedButton(
                 onPressed: () {
                   setState(() {
-                    quiz.nextQuestion(true);
+                    if (quiz.isGameOver()) showGameOverDialog();
+                    scoreKeeper.setAnswerIcon(
+                      quiz.isPlayerAnswerCorrect(true),
+                      quiz.getQuestionNumber(),
+                    );
+                    quiz.nextQuestion();
                   });
                 },
                 child: const Text('Yes'),
@@ -67,7 +99,10 @@ class _MainPageState extends State<MainPage> {
               ElevatedButton(
                 onPressed: () {
                   setState(() {
-                    quiz.nextQuestion(playerAnswer: false);
+                    if (quiz.isGameOver()) showGameOverDialog();
+                    scoreKeeper.setAnswerIcon(quiz.isPlayerAnswerCorrect(false),
+                        quiz.getQuestionNumber());
+                    quiz.nextQuestion();
                   });
                 },
                 child: const Text('No'),
@@ -81,7 +116,7 @@ class _MainPageState extends State<MainPage> {
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: quiz.scoreKeeper.getIconsList(),
+          children: scoreKeeper.getIconsList(),
         )
       ],
     );
